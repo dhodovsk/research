@@ -59,7 +59,7 @@ class PackageOnboarder:
         if self.repo and self.repo.working_dir:
             if os.path.exists(self.repo.working_dir):
                 logger.debug('Removing repository directory: %s', self.repo.working_dir)
-                shutil.rmtree(self.repo.working_dir)
+                # shutil.rmtree(self.repo.working_dir)
         if log_handler:
             logger.removeHandler(log_handler)
 
@@ -109,7 +109,14 @@ class PackageOnboarder:
 
         specs = [str(x) for x in Path(self.repo.working_dir).glob('**/*.spec.in')]
         if len(specs) != 0:
-            raise NeedsManualFinishup(f"Spec has to be generated in this repo")
+            ready = input('Continue?: (y/n) ')
+            if ready == 'y':
+                # load potential changes in packit conf
+                self.packit_api = get_packit_api(config=self.packit_cfg,
+                                                 local_project=self.packit_local_project)
+                return specs[0]
+            else:
+                raise NeedsManualFinishup(f"Spec has to be generated in this repo")
         # Try to find other spec files
         specs = [str(x) for x in Path(self.repo.working_dir).glob('**/*.spec')]
         if len(specs) == 1:
@@ -291,8 +298,8 @@ class PackageOnboarder:
             logger.info(f"Project already has a branch {ONBOARD_BRANCH_NAME} in {WHOAMI} namespace. Skipping.")
             return
 
-        self.announce_operation('Getting status')
-        self.packit_api.status()
+        # self.announce_operation('Getting status')
+        # self.packit_api.status()
 
         self.packit_local_project.git_repo.create_head(ONBOARD_BRANCH_NAME).checkout()
         up_spec = self.get_upstream_spec()

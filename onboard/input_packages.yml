@@ -1,2 +1,2 @@
-- downstream_name: rear
-  upstream_url: 'https://github.com/rear/rear/'
+- downstream_name: cockpit
+  upstream_url: https://github.com/cockpit-project/cockpit
